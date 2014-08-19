@@ -9,7 +9,7 @@ As an example: I may enter
 100 Rs. – 10 notes, 50 Rs. - 20 notes, 10 Rs. – 30 notes, 5 Rs. – 50 notes, 1 Rs. – 100 notes. I may choose to not feed the machine with 20 Rs. 
 As a: Customer, I can enter only 1 note @ a time. 
 
-Maximum possible denomination value is 1000 Rs. 
+Maximum possible denomination possible is 1000 Rs. 
 
 #### ATs:
 1.	When I insert a note, it should give me the change starting from next highest note to lowest note.
