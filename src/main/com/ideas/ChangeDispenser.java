@@ -43,10 +43,12 @@ public class ChangeDispenser {
 			nextAvailableDenomination = availableDenominations.lowerKey(nextAvailableDenomination);
 			if(nextAvailableDenomination == null)
 				return returnUserNote(userInputNote);
-			int availableNotes = getAvailableNotesForDenomination(currentAmountToDispense, nextAvailableDenomination);
-			currentAmountToDispense -= (nextAvailableDenomination * availableNotes);
-			resultingChange.put(nextAvailableDenomination, availableNotes);
-			updateCountOfNotesInDispenser(nextAvailableDenomination, availableNotes);
+			if(nextAvailableDenomination <= currentAmountToDispense) {
+				int availableNotes = getAvailableNotesForDenomination(currentAmountToDispense, nextAvailableDenomination);
+				currentAmountToDispense -= (nextAvailableDenomination * availableNotes);
+				resultingChange.put(nextAvailableDenomination, availableNotes);
+				updateCountOfNotesInDispenser(nextAvailableDenomination, availableNotes);
+			}
 		}
 		return resultingChange;
 	}

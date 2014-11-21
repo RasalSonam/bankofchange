@@ -116,8 +116,17 @@ public class ChangeDispenserTest {
 	@Test
 	public void changeRequestOnWeekendIsNotCharged() {
 		setUpMachineForTransactions();
-		TreeMap<Integer, Integer> resultingChange;
-		resultingChange = changeDispenser.getChange(100, getDummyWeekendDate());
+		TreeMap<Integer, Integer> resultingChange = changeDispenser.getChange(100, getDummyWeekendDate());
 		Assert.assertTrue(resultingChange.size() == 1 && resultingChange.get(50) == 2);
+	}
+	
+	@Test
+	public void changeRequestOnWeekdaysIsCharged() {
+		denominations.put(20, 2);
+		getMoneyFromBanker();
+		changeDispenser.feedMachine(denominations);
+		changeDispenser.updateServiceCharge(5);
+		TreeMap<Integer, Integer> resultingChange = changeDispenser.getChange(100, new Date());
+		Assert.assertTrue(resultingChange.size() == 3 && resultingChange.get(50) == 1 && resultingChange.get(20) == 2 && resultingChange.get(5) == 1);
 	}
 }
