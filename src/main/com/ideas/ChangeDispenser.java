@@ -2,17 +2,17 @@ package main.com.ideas;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class ChangeDispenser {
-	private TreeMap<Integer, Integer> availableDenominations;
+	private TreeMap<Integer, Integer> availableDenominations = new TreeMap<Integer, Integer>();
 	private final ArrayList<Integer> VALID_DENOMINATIONS = new ArrayList<Integer> (Arrays.asList(1, 5, 10, 20, 50, 100, 500, 1000));
+	private int serviceCharge = 2;
+	private ArrayList<Integer> DOW = new ArrayList<Integer>(Arrays.asList(1, 7));
 	
-	public ChangeDispenser() {
-		availableDenominations = new TreeMap<Integer, Integer>();
-	}
-
 	public boolean feedMachine(TreeMap<Integer, Integer> denominationsFromBanker) {
 		for(Map.Entry<Integer, Integer> entry : denominationsFromBanker.entrySet()) {
 			if(!checkForValidDenomination(entry.getKey())) {
@@ -31,11 +31,13 @@ public class ChangeDispenser {
 		return VALID_DENOMINATIONS.contains(denomination);
 	}
 	
-	public TreeMap<Integer, Integer> getChange(int userInputNote) {
+	public TreeMap<Integer, Integer> getChange(int userInputNote, Date transactionDate) {
 		TreeMap<Integer, Integer> resultingChange = new TreeMap<Integer, Integer>();
 		if(isMachineEmpty() || isDenominationInvalid(userInputNote))
 			return returnUserNote(userInputNote);
 		int currentAmountToDispense = userInputNote;
+		if(!isServiceFree(transactionDate))
+			currentAmountToDispense -= calculateServiceCharge(currentAmountToDispense);
 		Integer nextAvailableDenomination = currentAmountToDispense;
 		while(currentAmountToDispense > 0) {
 			nextAvailableDenomination = availableDenominations.lowerKey(nextAvailableDenomination);
@@ -47,6 +49,16 @@ public class ChangeDispenser {
 			updateCountOfNotesInDispenser(nextAvailableDenomination, availableNotes);
 		}
 		return resultingChange;
+	}
+
+	private int calculateServiceCharge(int chargeableAmount) {
+		return (int) Math.ceil((getServiceCharge() * chargeableAmount) / 100.0);
+	}
+
+	private boolean isServiceFree(Date transactionDate) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(transactionDate);
+		return DOW.contains(cal.get(Calendar.DAY_OF_WEEK));
 	}
 
 	private int getAvailableNotesForDenomination(int currentAmountToDispense, Integer nextAvailableDenomination) {
@@ -94,4 +106,22 @@ public class ChangeDispenser {
 		}
 		return OOSFlag;
 	}
+
+	public void updateServiceCharge(int newServiceCharge) {
+		this.serviceCharge = newServiceCharge;
+	}
+
+	public int getServiceCharge() {
+		return serviceCharge;
+	}
+
+	public ArrayList<Integer> updateDOWPattern(int... daysOfWeek) {
+		if(daysOfWeek.length > 0) {
+			DOW.clear();
+			for(int day : daysOfWeek)
+				DOW.add(day);
+		}
+		return DOW;
+	}
 }
+
